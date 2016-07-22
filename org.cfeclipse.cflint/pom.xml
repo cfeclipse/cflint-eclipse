@@ -68,7 +68,7 @@
 						<configuration>
 							<stripVersion>true</stripVersion>
 							<outputDirectory>${dependency.dir}</outputDirectory>
-							<includeGroupIds>com.github.cflint,com.fasterxml.jackson.core,com.fasterxml.jackson.module,org.slf4j</includeGroupIds>
+							<includeGroupIds>com.github.cflint,com.fasterxml.jackson.core,com.fasterxml.jackson.module,org.slf4j,log4j</includeGroupIds>
 						</configuration>
 					</execution>
 				</executions>
