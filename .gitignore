@@ -1,0 +1,3 @@
+org.cfeclipse.cflint/lib
+dist/
+**/target/

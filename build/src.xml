@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<src>
+	<project>
+		<src dest="@src.dir@" password="" type="git" 
+		 uri="@sc.cflint-eclipse.uri@" user="" remote="origin" branch="master"/>
+	</project>
+	<sources>
+	</sources>
+</src>

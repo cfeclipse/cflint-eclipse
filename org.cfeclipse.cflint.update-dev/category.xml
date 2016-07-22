@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <bundle id="org.cfeclipse.cfparser" version="1.0.0.qualifier">
+      <category name="cflint.category.id"/>
+   </bundle>
+   <category-def name="cflint.category.id" label="CFLint (Required)">
+      <description>
+         CFLint (Required)
+      </description>
+   </category-def>
+</site>

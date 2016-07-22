@@ -1,0 +1,102 @@
+<project name="distro.build" default="build" basedir="./" xmlns:antcontrib="antlib:net.sf.antcontrib">
+
+	<!--
+	<property name="featurename" value="org.cfeclipse.cfml.releng" />
+	<property name="product.checkout.url" value="org.cfeclipse.cfml.releng" />
+	-->
+	<loadproperties srcfile="build.properties"/>
+	<import file="${cfdistro.build.file}"/>
+
+	<property name="deploy.quiet" value="true"/>
+	<property name="site.suffix" value="-dev"/>
+	<property name="generator.suffix" value="I"/>
+	<property name="merge.updates" value="false"/>
+	<property name="plugin.p2.dir" value="${dist.dir}/cflint/update${site.suffix}"/>
+	<property name="plugin.p2.release.dir" value="http://cfeclipse.org/cflint/update${site.suffix}"/>
+	<property name="remote.cfeclipse.sites.dir" value="from.cfeclipse.properties"/>
+	<property name="remote.p2.dir" value="${remote.sites.dir}/cflint/update${site.suffix}"/>
+	<property name="sign" value="false"/>
+	<available file="${src.dir}/org.cfeclipse.cfparser/" type="dir" property="cfparserdir.isthere" />
+	
+	<target name="clean.all">
+		<delete dir="${dist.dir}"/>
+		<delete dir="${basedir}/workspace"/>
+		<delete dir="${basedir}/target-platform"/>
+	</target>
+	
+	<target name="cflint.checkout" unless="cfparserdir.isthere">
+         <antcontrib:runtarget target="project.update" />
+	</target>
+
+	<target name="build" depends="cflint.checkout">
+		<abspath property="src.dir" path="${src.dir}" />
+		<abspath property="dist.dir" path="${dist.dir}" />
+		<abspath property="product.zip.dir" path="${dist.dir}/product" />
+		<delete dir="${plugin.p2.dir}"/>
+		<mkdir dir="${dist.dir}"/>
+		<property name="script.dir" location="${src.dir}/org.cfeclipse.releng"/>
+		<echo message="sc.cflint-eclipse.branch:${sc.cflint-eclipse.branch} site.suffix:${site.suffix} generator.suffix:${generator.suffix}"/>
+ 		<maven-run basedir="${dist.root.dir}"
+             options="-Dplugin.p2.dir=${plugin.p2.dir} -Dbuild.type=${build.type} -Dsite.suffix=${site.suffix} -Dsign=${sign} -Dmerge.updates=${merge.updates}"
+             goal="clean verify"
+             resultproperty="maven.build.result"/>
+         <echo message="${maven.build.result}" />
+	</target>
+	<target name="p2.html">
+		<echo file="${temp.dir}/p2files.txt"><![CDATA[<table cellspacing="0" cellpadding="0"><tr><td colspan="2" style="border-top:0px; padding-top:3px;padding-left:8px;"><em>Files</em></td></tr>]]>
+		</echo>
+		<antcontrib:for param="file">
+			<path><fileset dir="${plugin.p2.dir}" includes="**/*.jar"/></path>
+			<sequential>
+				<antcontrib:propertyregex override="yes" property="p2file" input="@{file}" regexp=".*?${plugin.p2.dir}\/?(.+)" replace="\1"/>
+ 				<echo file="${temp.dir}/p2files.txt" append="true"><![CDATA[<tr><td valign="top" style="padding:5px"><a href="${p2file}">${p2file}</a></td><td valign="top" style="padding:5px"></td></tr>]]>
+				</echo>
+			</sequential>
+	  	</antcontrib:for>
+		<echo file="${temp.dir}/p2files.txt" append="true"><![CDATA[</table>]]></echo>
+		<loadfile srcfile="${temp.dir}/p2files.txt" property="p2files.table" />
+		<copy file="${src.dir}/org.cfeclipse.cflint.update${site.suffix}/index.html" todir="${plugin.p2.dir}">
+		    <filterchain><expandproperties /></filterchain>
+		</copy>
+		<replaceregexp file="${plugin.p2.dir}/index.html"
+		match='(?s)&lt;div id="data"&gt;.*?&lt;\/div&gt;'
+		replace='&lt;div id="data"&gt;${line.separator}${p2files.table}${line.separator}&lt;\/div&gt;' byline="false" />
+		<delete dir="${temp.dir}" />		
+	</target>
+
+	<target name="build.release" depends="project.update,build.and.scp">
+		<git command="log" dir="${src.dir}" verbose="false" use-jgit="false"><args><arg value="-n"/><arg value="1"/><arg value="origin/${sc.cflint-eclipse.branch}"/></args></git>
+		<antcontrib:propertyregex property="info.smaller"
+			input="${git.results}" global="true"
+			regexp="(?s)commit (\w{7}).+?Author\: (\w+[\w ]+).+?Date:.+?[\r\n]+[^\S]+(.+)"
+			description="\1 is commit hash, \2 is author, \3 is message"
+			select=" #CFML #CFLint ${build.type} \2 > \3"
+			casesensitive="false" />
+		<!--
+		<input message="Tweet:" defaultvalue="${info.smaller}" addproperty="tweet" />
+		-->
+    	<taskdef-dependency name="twitter" classname="de.ecw.ant.twitter.AntTwitterTask" artifactId="ant-twitter" groupId="cfdistro.lib" version="1.0.0" />
+		<twitter message="${info.smaller}" 
+			consumerKey="${remote.cfeclipse.twitter.consumer.key}" 
+			consumerSecret="${remote.cfeclipse.twitter.consumer.secret}" 
+			accessToken="${remote.cfeclipse.twitter.token}" 
+			accessTokenSecret="${remote.cfeclipse.twitter.token.secret}" 
+			bitlyUsername="bitly-username" 
+			bitlyApiKey="bitly-key" 
+			enableBitly="false" />
+	</target>
+
+	<target name="build.and.scp" depends="build">
+		<antcontrib:var name="remote" value="cfeclipse"/>
+		<cfdistro.setremote />
+		<echo message="scp update site"/>
+		<deploy-scp toDir="${remote.user}@${remote.host}:${remote.p2.dir}" fromdir="${plugin.p2.dir}">
+			<scpfiles>
+				<fileset dir="${plugin.p2.dir}">
+					<include name="**/*"/>
+				</fileset>
+			</scpfiles>
+		</deploy-scp>
+	</target>
+	
+</project>
