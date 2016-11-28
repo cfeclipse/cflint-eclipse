@@ -2,7 +2,7 @@
 <src>
 	<project>
 		<src dest="@src.dir@" password="" type="git" 
-		 uri="@sc.cflint-eclipse.uri@" user="" remote="origin" branch="master"/>
+		 uri="@sc.cflint-eclipse.uri@" user="" remote="origin" branch="@sc.cflint-eclipse.branch@"/>
 	</project>
 	<sources>
 	</sources>
