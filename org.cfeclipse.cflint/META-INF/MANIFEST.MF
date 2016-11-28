@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: CFLint
 Bundle-SymbolicName: org.cfeclipse.cflint
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 0.10.0.qualifier
 Bundle-Activator: org.cfeclipse.cflint.Activator
 Require-Bundle: org.cfeclipse.cfparser;bundle-version="1.0.0",
  org.eclipse.core.runtime,
