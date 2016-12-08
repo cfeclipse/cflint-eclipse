@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<plugin>
+	<extension
+         point="org.eclipse.ui.propertyPages">
+	  <page
+            class="org.cfeclipse.cflint.store.ProjectPropertyPage"
+            id="org.cfeclipse.cflint.store.ProjectPropertyPage"
+            icon="icons/cflint_16x16.png"
+            name="CFLint Properties"
+            nameFilter="*">
+         <filter name="projectNature" value="org.cfeclipse.cfml.CFENature" />
+         <enabledWhen>
+            <instanceof
+                  value="org.eclipse.core.resources.IProject">
+            </instanceof>
+         </enabledWhen>
+      </page>
+    </extension>
+
+    <extension point="org.eclipse.core.resources.markers"
+   		id="cflintmarker"
+   		name="CFLint Marker">
+		<super type="org.eclipse.core.resources.problemmarker"/> 
+      	<super type="org.eclipse.core.resources.textmarker"/> 
+      	<persistent value="true"/>
+	</extension>
+
+</plugin>

@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.cfeclipse.cflint</groupId>
 		<artifactId>cflint</artifactId>
-		<version>0.10.0-SNAPSHOT</version>
+		<version>1.0.10-SNAPSHOT</version>
 	</parent>
 	<groupId>org.cfeclipse.cflint</groupId>
 	<artifactId>org.cfeclipse.cflint.update-dev</artifactId>
@@ -16,7 +16,32 @@
 		<site.suffix>-dev</site.suffix>
 		<plugin.p2.dir>target/repository-merged</plugin.p2.dir>
 		<merge.updates>false</merge.updates>
+		<jboss.tycho.tools.version>0.26.0</jboss.tycho.tools.version>
+		<update.site.name>[dev] CFLint Update</update.site.name>
+		<update.site.description>Development Build</update.site.description>
+		<update.site.version>${project.version}</update.site.version>
+		
+		<cfparser-repo.url>http://cfeclipse.org/cfparser/update</cfparser-repo.url>
+		<cfparser-dev-repo.url>http://cfeclipse.org/cfparser/update-dev</cfparser-dev-repo.url>
 	</properties>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>jboss</id>
+			<name>jboss</name>
+			<layout>default</layout>
+			<url>http://repository.jboss.org/nexus/content/repositories/releases</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>cfparser</id>
+			<layout>default</layout>
+			<url>${cfparser-repo.url}</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>cfparser-dev</id>
+			<layout>default</layout>
+			<url>${cfparser-dev-repo.url}</url>
+		</pluginRepository>
+	</pluginRepositories>
 	<profiles>
 		<profile>
 			<id>merge-updates</id>
@@ -71,11 +96,40 @@
 						<configuration>
 							<target>
 								<copy todir="${plugin.p2.dir}">
-									<fileset dir="${project.basedir}" includes="index.html" />
 									<fileset dir="${project.build.directory}/repository"
-										includes="*/**" />
+										includes="*/**" excludes="target/**"/>
 								</copy>
 							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.jboss.tools.tycho-plugins</groupId>
+				<artifactId>repository-utils</artifactId>
+				<version>${jboss.tycho.tools.version}</version>
+				<executions>
+					<!-- creates index.html and other artifacts -->
+					<execution>
+						<id>generate-facade</id>
+						<phase>package</phase>
+						<goals>
+							<goal>generate-repository-facade</goal>
+						</goals>
+						<configuration>
+							<siteTemplateFolder>${project.basedir}</siteTemplateFolder>
+							<!-- configuration options for the generated HTML page -->
+							<symbols>
+								<update.site.name>${update.site.name}</update.site.name>
+								<update.site.description>${update.site.description}</update.site.description>
+								<update.site.version>${update.site.version}</update.site.version>
+							</symbols>
+							<associateSites>
+								<site>http://cfeclipse.org/cfparser/update/</site>
+								<site>http://cfeclipse.org/cfparser/update-dev/</site>
+							</associateSites>
+							<!-- to remove the default category created for any uncategorized features or bundles, set this to true -->
+							<removeDefaultCategory>true</removeDefaultCategory>
 						</configuration>
 					</execution>
 				</executions>

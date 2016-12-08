@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: CFLint
-Bundle-SymbolicName: org.cfeclipse.cflint
-Bundle-Version: 0.10.0.qualifier
-Bundle-Activator: org.cfeclipse.cflint.Activator
-Require-Bundle: org.cfeclipse.cfparser;bundle-version="1.0.0",
+Bundle-SymbolicName: org.cfeclipse.cflint;singleton:=true
+Bundle-Version: 1.0.10.qualifier
+Bundle-Activator: org.cfeclipse.cflint.CFLintPlugin
+Require-Bundle: org.cfeclipse.cfparser;bundle-version="2.2.11",
  org.eclipse.core.runtime,
  org.eclipse.ui
 Bundle-ClassPath: .,
@@ -20,6 +20,7 @@ Bundle-ClassPath: .,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: com.cflint,
+ com.cflint.ant,
  com.cflint.config,
  com.cflint.listeners,
  com.cflint.main,
@@ -27,4 +28,9 @@ Export-Package: com.cflint,
  com.cflint.plugins.core,
  com.cflint.plugins.exceptions,
  com.cflint.tools,
- org.cfeclipse.cflint
+ com.cflint.xml,
+ com.cflint.xml.stax,
+ org.cfeclipse.cflint,
+ org.cfeclipse.cflint.config,
+ org.cfeclipse.cflint.store
+Import-Package: org.eclipse.core.resources

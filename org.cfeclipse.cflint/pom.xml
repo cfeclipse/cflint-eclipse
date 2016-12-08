@@ -4,13 +4,13 @@
 	<parent>
 		<groupId>org.cfeclipse.cflint</groupId>
 		<artifactId>cflint</artifactId>
-		<version>0.10.0-SNAPSHOT</version>
+		<version>1.0.10-SNAPSHOT</version>
 	</parent>
 	<artifactId>org.cfeclipse.cflint</artifactId>
 	<packaging>eclipse-plugin</packaging>
 
 	<properties>
-		<cfparser.version>2.2.11-SNAPSHOT</cfparser.version>
+		<cflint.version>0.11.0-SNAPSHOT</cflint.version>
 		<cfparser-repo.url>http://cfeclipse.org/cfparser/update</cfparser-repo.url>
 		<dependency.dir>${project.basedir}/lib</dependency.dir>
 	</properties>
@@ -32,7 +32,7 @@
 		<dependency>
 			<groupId>com.github.cflint</groupId>
 			<artifactId>CFLint</artifactId>
-			<version>0.10.0-SNAPSHOT</version>
+			<version>${cflint.version}</version>
 		</dependency>
 	</dependencies>
 

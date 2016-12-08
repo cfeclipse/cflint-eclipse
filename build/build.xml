@@ -13,10 +13,9 @@
 	<property name="merge.updates" value="false"/>
 	<property name="plugin.p2.dir" value="${dist.dir}/cflint/update${site.suffix}"/>
 	<property name="plugin.p2.release.dir" value="http://cfeclipse.org/cflint/update${site.suffix}"/>
-	<property name="remote.cfeclipse.sites.dir" value="from.cfeclipse.properties"/>
 	<property name="remote.p2.dir" value="${remote.sites.dir}/cflint/update${site.suffix}"/>
 	<property name="sign" value="false"/>
-	<available file="${src.dir}/org.cfeclipse.cfparser/" type="dir" property="cfparserdir.isthere" />
+	<available file="${src.dir}/org.cfeclipse.cflint/" type="dir" property="cflintdir.isthere" />
 	
 	<target name="clean.all">
 		<delete dir="${dist.dir}"/>
@@ -24,7 +23,7 @@
 		<delete dir="${basedir}/target-platform"/>
 	</target>
 	
-	<target name="cflint.checkout" unless="cfparserdir.isthere">
+	<target name="cflint.checkout" unless="cflintdir.isthere">
          <antcontrib:runtarget target="project.update" />
 	</target>
 
@@ -40,10 +39,10 @@
              options="-Dplugin.p2.dir=${plugin.p2.dir} -Dbuild.type=${build.type} -Dsite.suffix=${site.suffix} -Dsign=${sign} -Dmerge.updates=${merge.updates}"
              goal="clean verify"
              resultproperty="maven.build.result"/>
-         <echo message="${maven.build.result}" />
+        <echo message="${maven.build.result}" />
 	</target>
 	<target name="p2.html">
-		<echo file="${temp.dir}/p2files.txt"><![CDATA[<table cellspacing="0" cellpadding="0"><tr><td colspan="2" style="border-top:0px; padding-top:3px;padding-left:8px;"><em>Files</em></td></tr>]]>
+		<echo file="${temp.dir}/p2files.txt"><![CDATA[<table class="table table-striped table-hover "><thead><tr><th colspan="2" style="border-top:0px; padding-top:3px;padding-left:8px;"><em>Files</em></th></tr></thead><tbody>]]>
 		</echo>
 		<antcontrib:for param="file">
 			<path><fileset dir="${plugin.p2.dir}" includes="**/*.jar"/></path>
@@ -53,7 +52,7 @@
 				</echo>
 			</sequential>
 	  	</antcontrib:for>
-		<echo file="${temp.dir}/p2files.txt" append="true"><![CDATA[</table>]]></echo>
+		<echo file="${temp.dir}/p2files.txt" append="true"><![CDATA[</tbody></table>]]></echo>
 		<loadfile srcfile="${temp.dir}/p2files.txt" property="p2files.table" />
 		<copy file="${src.dir}/org.cfeclipse.cflint.update${site.suffix}/index.html" todir="${plugin.p2.dir}">
 		    <filterchain><expandproperties /></filterchain>
