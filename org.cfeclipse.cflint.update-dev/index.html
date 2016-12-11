@@ -7,7 +7,6 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-
     <title>${update.site.name}</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cerulean/bootstrap.min.css" rel="stylesheet">
@@ -18,7 +17,7 @@
     <div class="navbar navbar-default navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
-          <a href="../" class="navbar-brand">org.cfeclipse.cflint</a>
+          <a href="../" class="navbar-brand">${update.site.groupId}</a>
           <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -27,7 +26,7 @@
         </div>
         <div class="navbar-collapse collapse" id="navbar-main">
           <ul class="nav navbar-nav">
-            <li><a href="http://github.com/cflint" title="github">github</a></li>
+            <li><a href="${update.site.github}" title="github">github</a></li>
             <li><a href="http://cfeclipse.org/">CFEclipse</a></li>
           </ul>
         </div>
@@ -38,19 +37,15 @@
     
       <div class="page-header" id="banner">
         <div class="row">
-          <div class="col-lg-8 col-md-7 col-sm-6">
-            <h1>${update.site.name}</h1>
-            <p class="lead">Eclipse update site</p>
-          </div>
-          <div class="col-lg-4 col-md-5 col-sm-6">
-          </div>
+          <h1>${update.site.name}</h1>
+          <p class="lead">Eclipse update site</p>
         </div>
         <div class="row">
           <p>
-          This is the Eclipse update site for the org.cfeclipse.cflint Eclipse plugin.  
+          This is the Eclipse update site for the ${update.site.groupId} Eclipse plugin.  
           You need to have Eclipse version 3.4 or above, 
           and add an update site using this URL: 
-          <br/><br/>http://cfeclipse.org/cflint/update-dev/<br/><br/>
+          <br/><br/>${update.site.url}<br/><br/>
           to install it.
           </p>
           <hr/>

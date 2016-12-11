@@ -40,6 +40,7 @@
              goal="clean verify"
              resultproperty="maven.build.result"/>
         <echo message="${maven.build.result}" />
+         <antcontrib:runtarget target="p2.html" />
 	</target>
 	<target name="p2.html">
 		<echo file="${temp.dir}/p2files.txt"><![CDATA[<table class="table table-striped table-hover "><thead><tr><th colspan="2" style="border-top:0px; padding-top:3px;padding-left:8px;"><em>Files</em></th></tr></thead><tbody>]]>

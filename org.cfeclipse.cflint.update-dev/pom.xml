@@ -18,6 +18,8 @@
 		<merge.updates>false</merge.updates>
 		<jboss.tycho.tools.version>0.26.0</jboss.tycho.tools.version>
 		<update.site.name>[dev] CFLint Update</update.site.name>
+		<update.site.url>http://cfeclipse.org/cflint/update${site.suffix}</update.site.url>
+		<update.site.github>http://github.com/cfeclipse/org.cfeclipse.cflint</update.site.github>
 		<update.site.description>Development Build</update.site.description>
 		<update.site.version>${project.version}</update.site.version>
 		
@@ -31,17 +33,19 @@
 			<layout>default</layout>
 			<url>http://repository.jboss.org/nexus/content/repositories/releases</url>
 		</pluginRepository>
-		<pluginRepository>
-			<id>cfparser</id>
-			<layout>default</layout>
-			<url>${cfparser-repo.url}</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>cfparser-dev</id>
-			<layout>default</layout>
-			<url>${cfparser-dev-repo.url}</url>
-		</pluginRepository>
 	</pluginRepositories>
+	<repositories>
+		<repository>
+			<id>cfparser</id>
+			<layout>p2</layout>
+			<url>${cfparser-repo.url}</url>
+		</repository>
+		<repository>
+			<id>cfparser-dev</id>
+			<layout>p2</layout>
+			<url>${cfparser-dev-repo.url}</url>
+		</repository>
+	</repositories>
 	<profiles>
 		<profile>
 			<id>merge-updates</id>
@@ -123,6 +127,9 @@
 								<update.site.name>${update.site.name}</update.site.name>
 								<update.site.description>${update.site.description}</update.site.description>
 								<update.site.version>${update.site.version}</update.site.version>
+								<update.site.url>${update.site.url}</update.site.url>
+								<update.site.github>${update.site.github}</update.site.github>
+								<update.site.groupId>${project.groupId}</update.site.groupId>
 							</symbols>
 							<associateSites>
 								<site>http://cfeclipse.org/cfparser/update/</site>
