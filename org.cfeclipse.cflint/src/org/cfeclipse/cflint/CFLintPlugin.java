@@ -2,6 +2,7 @@ package org.cfeclipse.cflint;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 
 import org.cfeclipse.cflint.config.CFLintConfigUI;
 import org.eclipse.core.resources.IMarker;
@@ -14,6 +15,8 @@ import com.cflint.BugInfo;
 import com.cflint.BugList;
 import com.cflint.CFLint;
 import com.cflint.config.CFLintConfig;
+import com.cflint.config.ConfigRuntime;
+import com.cflint.plugins.CFLintScanner;
 import com.cflint.tools.CFLintFilter;
 
 /**
@@ -28,6 +31,7 @@ public class CFLintPlugin extends AbstractUIPlugin {
 	private static CFLintPlugin plugin;
 
 	private CFLint cflint;
+	private CFLint scannerLinter;
 	private HashMap<String, CFLintConfig> projectCFLintConfigs = new HashMap<String, CFLintConfig>();
 	
 	
@@ -100,8 +104,6 @@ public class CFLintPlugin extends AbstractUIPlugin {
 				cflint.setProgressUsesThread(true);
 				CFLintFilter filter = CFLintFilter.createFilter(true);
 				cflint.getBugs().setFilter(filter);
-				// List<CFLintScanner> scanners = cflint.getScanners();
-				// cflint.addScanner(new CFLintPlugin());
 			}
 			cflint.getBugs().getBugList().clear();
 			File sourceFile = res.getRawLocation().makeAbsolute().toFile();
@@ -117,6 +119,42 @@ public class CFLintPlugin extends AbstractUIPlugin {
 		}
 	}
 
+	public void scanResource(IResource res, CFLintScanner scanner) {
+		if (!res.isAccessible() || !res.exists())
+			return;
+		if (res.getRawLocation() == null || res.getRawLocation().toFile().isDirectory())
+			return;
+		if (!res.getRawLocation().toFile().getAbsolutePath().endsWith(".cfm")
+				&& !res.getRawLocation().toFile().getAbsolutePath().endsWith(".cfc"))
+			return;
+		try {
+//			res.deleteMarkers(CFLintBuilder.MARKER_TYPE, true, IResource.DEPTH_ONE);
+			CFLintConfig config = new ConfigRuntime(null,null);
+			if (scannerLinter == null) {
+				scannerLinter = new CFLint(config);
+				scannerLinter.setVerbose(true);
+				scannerLinter.setLogError(true);
+				scannerLinter.setQuiet(false);
+				scannerLinter.setShowProgress(false);
+				scannerLinter.setProgressUsesThread(true);
+				CFLintFilter filter = CFLintFilter.createFilter(true);
+				scannerLinter.getBugs().setFilter(filter);
+				scannerLinter.addScanner(scanner);
+			}
+			scannerLinter.getBugs().getBugList().clear();
+			File sourceFile = res.getRawLocation().makeAbsolute().toFile();
+			System.out.println("Scanning Resource" + sourceFile.getAbsolutePath());
+			scannerLinter.scan(sourceFile);
+//			BugList bugList = cflintResourceScanner.getBugs();
+//			for (BugInfo bugInfo : bugList) {
+//				addMarker(res, bugInfo);
+//			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	private void addMarker(IResource res, BugInfo bug) {
 		try {
 			IMarker marker = res.createMarker(CFLintBuilder.MARKER_TYPE);

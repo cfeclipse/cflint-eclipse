@@ -8,4 +8,5 @@
          CFLint (Required)
       </description>
    </category-def>
+   <repository-reference location="http://cfeclipse.org/cfparser/update" enabled="true" />
 </site>
