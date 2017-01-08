@@ -10,7 +10,7 @@
 	<packaging>eclipse-plugin</packaging>
 
 	<properties>
-		<cflint.version>0.11.0-SNAPSHOT</cflint.version>
+		<cflint.version>0.12.0-SNAPSHOT</cflint.version>
 		<cfparser-repo.url>http://cfeclipse.org/cfparser/update</cfparser-repo.url>
 		<dependency.dir>${project.basedir}/lib</dependency.dir>
 	</properties>
