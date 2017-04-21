@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: CFLint
 Bundle-SymbolicName: org.cfeclipse.cflint;singleton:=true
-Bundle-Version: 1.0.10.qualifier
+Bundle-Version: 1.1.0.qualifier
 Bundle-Activator: org.cfeclipse.cflint.CFLintPlugin
 Require-Bundle: org.cfeclipse.cfparser;bundle-version="2.2.11",
  org.eclipse.core.runtime,
@@ -16,6 +16,7 @@ Bundle-ClassPath: .,
  lib/slf4j-api.jar,
  lib/slf4j-log4j12.jar,
  lib/slf4j-simple.jar,
+ lib/commons-io.jar,
  lib/log4j.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

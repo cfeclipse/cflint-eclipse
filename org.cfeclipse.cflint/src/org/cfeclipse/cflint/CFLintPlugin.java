@@ -15,7 +15,7 @@ import com.cflint.BugInfo;
 import com.cflint.BugList;
 import com.cflint.CFLint;
 import com.cflint.config.CFLintConfig;
-import com.cflint.config.ConfigRuntime;
+import com.cflint.config.ConfigUtils;
 import com.cflint.plugins.CFLintScanner;
 import com.cflint.tools.CFLintFilter;
 
@@ -128,8 +128,9 @@ public class CFLintPlugin extends AbstractUIPlugin {
 				&& !res.getRawLocation().toFile().getAbsolutePath().endsWith(".cfc"))
 			return;
 		try {
+			CFLintConfig config = new CFLintConfig();
+//			config.setRules(ConfigUtils.loadDefaultPluginInfo().getRules());
 //			res.deleteMarkers(CFLintBuilder.MARKER_TYPE, true, IResource.DEPTH_ONE);
-			CFLintConfig config = new ConfigRuntime(null,null);
 			if (scannerLinter == null) {
 				scannerLinter = new CFLint(config);
 				scannerLinter.setVerbose(true);

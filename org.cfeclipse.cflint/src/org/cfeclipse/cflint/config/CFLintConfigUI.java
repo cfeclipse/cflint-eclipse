@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Button;
 import com.cflint.config.CFLintConfig;
 import com.cflint.config.CFLintPluginInfo;
-import com.cflint.config.ConfigRuntime;
 import com.cflint.config.CFLintPluginInfo.PluginInfoRule;
 import com.cflint.config.CFLintPluginInfo.PluginInfoRule.PluginMessage;
 import com.cflint.config.ConfigUtils;
@@ -95,7 +94,8 @@ public class CFLintConfigUI {
 				e.printStackTrace();
 			}
 		} else {
-			currentConfig = new ConfigRuntime(null,pluginInfo);
+			currentConfig = new CFLintConfig();
+			currentConfig.setRules(pluginInfo.getRules());
 		}
 		return currentConfig;
 	}
@@ -138,7 +138,9 @@ public class CFLintConfigUI {
 	}
 
 	public void resetProjectRules() {
-		setConfig(new ConfigRuntime(null,pluginInfo));
+		CFLintConfig config = new CFLintConfig();
+		config.setRules(pluginInfo.getRules());
+		setConfig(config);
 	}
 
 }
