@@ -1,5 +1,16 @@
 <?xml version="1.0"?>
 <plugin>
+
+	<extension
+      id="Builder" name="CFLint Builder" point="org.eclipse.core.resources.builders">
+      <builder hasNature="false">
+         <run class="org.cfeclipse.cflint.CFLintBuilder">
+         	<parameter name="optimize" value="true" />
+            <parameter name="comment" value="Builder comment" />
+         </run>
+      </builder>
+   </extension>
+
 	<extension
          point="org.eclipse.ui.propertyPages">
 	  <page
@@ -15,6 +26,20 @@
             </instanceof>
          </enabledWhen>
       </page>
+	  <page
+            class="org.cfeclipse.cflint.store.ProjectPropertyPage"
+            id="org.cfeclipse.cflint.store.cfbuilder.ProjectPropertyPage"
+            icon="icons/cflint_16x16.png"
+            name="CFLint Properties"
+            nameFilter="*">
+         <filter name="projectNature" value="com.adobe.ide.coldfusion.projectNature" />
+         <enabledWhen>
+            <instanceof
+                  value="org.eclipse.core.resources.IProject">
+            </instanceof>
+         </enabledWhen>
+      </page>
+
     </extension>
 
     <extension point="org.eclipse.core.resources.markers"
@@ -24,5 +49,9 @@
       	<super type="org.eclipse.core.resources.textmarker"/> 
       	<persistent value="true"/>
 	</extension>
+    <extension
+          id="cflintApp"
+          point="org.eclipse.core.runtime.applications">
+    </extension>
 
 </plugin>

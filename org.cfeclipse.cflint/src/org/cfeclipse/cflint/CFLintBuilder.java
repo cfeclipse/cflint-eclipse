@@ -25,6 +25,7 @@ public class CFLintBuilder extends IncrementalProjectBuilder {
 
 	private CFLintPropertyManager propertyManager = new CFLintPropertyManager();
 	public static final String MARKER_TYPE = "org.cfeclipse.cflint.cflintmarker";
+	public static final String BUILDER_ID = "org.cfeclipse.cflint.Builder";
 
 	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {

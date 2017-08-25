@@ -1,7 +1,11 @@
 package org.cfeclipse.cflint.store;
 
+import org.cfeclipse.cflint.CFLintBuilder;
 import org.cfeclipse.cflint.config.CFLintConfigUI;
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
@@ -115,9 +119,43 @@ public class ProjectPropertyPage extends PropertyPage {
 	}
 
 	public boolean performOk() {
-		propertyManager.setCFLintEnabledProject(cflintEnabledField.getBooleanValue(), (IProject) getElement());
-		propertyManager.setCFLintStoreConfigInProject(cflintStoreConfigInProjectField.getBooleanValue(), (IProject) getElement());
+		IProject project = (IProject) getElement();
+		propertyManager.setCFLintEnabledProject(cflintEnabledField.getBooleanValue(), project);
+		propertyManager.setCFLintStoreConfigInProject(cflintStoreConfigInProjectField.getBooleanValue(), project);
 		cflintConfigUI.setProjectRules((IProject) getElement());
+		try {
+			final String BUILDER_ID = CFLintBuilder.BUILDER_ID;
+			IProjectDescription desc;
+			desc = project.getDescription();
+			ICommand[] commands = desc.getBuildSpec();
+			boolean found = false;
+			for (int i = 0; i < commands.length; ++i) {
+				if (commands[i].getBuilderName().equals(BUILDER_ID)) {
+					found = true;
+					break;
+				}
+			}
+			if (!found && cflintEnabledField.getBooleanValue()) {
+				ICommand command = desc.newCommand();
+				command.setBuilderName(BUILDER_ID);
+				ICommand[] newCommands = new ICommand[commands.length + 1];
+				// Add it before other builders.
+				System.arraycopy(commands, 0, newCommands, 1, commands.length);
+				newCommands[0] = command;
+				desc.setBuildSpec(newCommands);
+				project.setDescription(desc, null);
+			} else if (found && !cflintEnabledField.getBooleanValue()) {
+				ICommand[] newCommands = new ICommand[commands.length - 1];
+				for (int i = 0; i < commands.length; ++i) {
+					if (!commands[i].getBuilderName().equals(BUILDER_ID)) {
+						newCommands[i] = commands[i];
+					}
+				}				
+			}
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return true;
 	}
 
