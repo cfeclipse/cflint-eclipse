@@ -1,7 +1,7 @@
 Eclipse-AutoStart: true
 Bundle-SymbolicName: org.cfeclipse.cflint;singleton=true
 Bundle-Name: CFLint
-Bundle-Version: 1.1.0
+Bundle-Version: 1.3.0.qualifier
 Bundle-Vendor: cflint.org
 Import-Package: org.eclipse.core.resources,
  org.eclipse.core.runtime,
@@ -17,6 +17,7 @@ Import-Package: org.eclipse.core.resources,
  org.eclipse.ui.plugin,
  org.osgi.framework
 Require-Bundle: org.eclipse.swt,
+ org.eclipse.ui.ide,
  org.cfeclipse.cfparser;bundle-version="2.4.5"
 Provide-Package: com.cflint,
  com.cflint.ant,

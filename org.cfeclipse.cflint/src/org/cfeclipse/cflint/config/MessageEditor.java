@@ -52,7 +52,7 @@ public class MessageEditor extends Group {
 				
 		severityCombo = new Combo(this, SWT.NONE);
 		severityCombo.setItems(new String[] {"INFO", "WARN", "ERROR"});
-		severityCombo.setText(message.getSeverity());
+		severityCombo.setText(message.getSeverity().toString());
 		
 		messageText = new Text(this, SWT.BORDER);
 		messageText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));

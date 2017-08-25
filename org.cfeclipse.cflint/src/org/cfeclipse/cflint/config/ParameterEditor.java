@@ -36,7 +36,7 @@ public class ParameterEditor extends Group {
 		
 		parameterText = new Text(this, SWT.BORDER);
 		parameterText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		parameterText.setText(parameter.getValue());
+		parameterText.setText(parameter.getValue().toString());
 
 	}
 

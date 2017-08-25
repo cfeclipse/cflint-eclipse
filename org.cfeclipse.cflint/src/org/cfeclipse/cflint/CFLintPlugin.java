@@ -2,7 +2,6 @@ package org.cfeclipse.cflint;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 
 import org.cfeclipse.cflint.config.CFLintConfigUI;
 import org.eclipse.core.resources.IMarker;
@@ -15,7 +14,6 @@ import com.cflint.BugInfo;
 import com.cflint.BugList;
 import com.cflint.CFLint;
 import com.cflint.config.CFLintConfig;
-import com.cflint.config.ConfigUtils;
 import com.cflint.plugins.CFLintScanner;
 import com.cflint.tools.CFLintFilter;
 
@@ -161,7 +159,7 @@ public class CFLintPlugin extends AbstractUIPlugin {
 			IMarker marker = res.createMarker(CFLintBuilder.MARKER_TYPE);
 			int lineNumber = bug.getLine();
 			marker.setAttribute(IMarker.MESSAGE, bug.getSeverity() + ": " + bug.getMessage() + " (" + bug.getMessageCode() + ")");
-			if (bug.getSeverity().startsWith("WARN")) {
+			if (bug.getSeverity().toString().startsWith("WARN")) {
 				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
 			}
 			else if (bug.getSeverity().equals("INFO")) {

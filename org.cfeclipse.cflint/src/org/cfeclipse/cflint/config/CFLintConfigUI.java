@@ -60,7 +60,7 @@ public class CFLintConfigUI {
 			}
 		});
 		ruleEditors = new ArrayList<RuleEditor>();
-		HashMap<String, String> descriptions = ConfigUtils.loadDescriptions();
+		HashMap<String, String> descriptions = (HashMap<String, String>) ConfigUtils.loadDescriptions();
 		for (PluginInfoRule rule : pluginInfo.getRules()) {
 			RuleEditor ruleEdit;
 			if(enabledRules.contains(rule)){
