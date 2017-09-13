@@ -88,12 +88,12 @@
       "message": [
         {
           "code": "QUERYPARAM_REQ",
-          "messageText": "setSql() statement should use .addParam() instead of #'s for security.",
+          "messageText": "setSql() statement should use .addParam() instead of #'s name=\"${variable}\"",
           "severity": "WARNING"
         },
         {
           "code": "CFQUERYPARAM_REQ",
-          "messageText": "<${tag} name=\"${variable}\"> should use <cfqueryparam\/> for security reasons.",
+          "messageText": "<${tag}> should use <cfqueryparam\/> for variable '${variable}'.",
           "severity": "WARNING"
         }
       ],
@@ -162,6 +162,17 @@
       ]
     },
     {
+      "name": "CFBuiltInFunctionChecker",
+      "className": "BuiltInFunctionChecker",
+      "message": [
+        {
+          "code": "AVOID_USING_ISDATE",
+          "messageText": "Avoid using the isDate built-in function.  It is too permissive.  Using isValid() instead.",
+          "severity": "WARNING"
+        }
+      ]
+    },
+    {
       "name": "CFAbortChecker",
       "className": "CFXTagChecker",
       "message": [
@@ -184,7 +195,8 @@
       "message": [
         {
           "code": "AVOID_USING_ABORT",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText" : "Avoid using abort in production code."
         }
       ],
       "parameter": [
@@ -269,6 +281,7 @@
       "message": [
         {
           "code": "COMPONENT_HINT_MISSING",
+          "messageText" : "Component ${variable} is missing a hint.",
           "severity": "WARNING"
         }
       ],
@@ -282,6 +295,7 @@
       "message": [
         {
           "code": "FUNCTION_HINT_MISSING",
+          "messageText" : "Function ${variable} is missing a hint.",
           "severity": "INFO"
         }
       ],
@@ -295,7 +309,13 @@
       "message": [
         {
           "code": "ARG_HINT_MISSING",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText" : "Argument ${variable} is missing a hint."
+        },
+        {
+          "code": "ARG_HINT_MISSING_SCRIPT",
+          "severity": "INFO",
+          "messageText" : "Argument ${variable} is missing a hint.  Use javadoc style annotations on cfscript functions."
         }
       ],
       "parameter": [
@@ -308,11 +328,13 @@
       "message": [
         {
           "code": "ARG_TYPE_MISSING",
-          "severity": "WARNING"
+          "severity": "WARNING",
+          "messageText": "ARGUMENT ${variable} is missing a type."
         },
         {
           "code": "ARG_TYPE_ANY",
-          "severity": "INFO"
+          "severity": "WARNING",
+          "messageText": "Argument ${variable} is any. Please change to be the correct type."
         }
       ],
       "parameter": [
@@ -325,7 +347,8 @@
       "message": [
         {
           "code": "EXCESSIVE_FUNCTION_LENGTH",
-          "severity": "WARNING"
+          "severity": "WARNING",
+          "messageText": "Function ${function} is ${variable} lines. Should be less than ${length} lines."
         }
       ],
       "parameter": [
@@ -341,7 +364,8 @@
       "message": [
         {
           "code": "EXCESSIVE_COMPONENT_LENGTH",
-          "severity": "WARNING"
+          "severity": "WARNING",
+          "messageText": "Component ${component} is ${variable} lines. Should be less than ${length} lines."
         }
       ],
       "parameter": [
@@ -357,11 +381,13 @@
       "message": [
         {
           "code": "FUNCTION_TYPE_MISSING",
-          "severity": "WARNING"
+          "severity": "WARNING",
+          "messageText": "Function ${variable} return type is missing a return type."
         },
         {
           "code": "FUNCTION_TYPE_ANY",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText": "Function ${variable} return type is any. Please change to be the correct type."
         }
       ],
       "parameter": [
@@ -373,6 +399,7 @@
       "className": "TooManyArgumentsChecker",
       "message": [
         {
+          "messageText": "Function ${function} has too many arguments. Should be less than ${maximum}.",
           "code": "EXCESSIVE_ARGUMENTS",
           "severity": "WARNING"
         }
@@ -386,9 +413,10 @@
     },
     {
       "name": "TooManyFunctionsChecker",
-      "className": "TooManyArgumentsChecker",
+      "className": "TooManyFunctionsChecker",
       "message": [
         {
+          "messageText": "Component ${component} has too many functions. Should be fewer than ${maximum}.",
           "code": "EXCESSIVE_FUNCTIONS",
           "severity": "WARNING"
         }
@@ -405,6 +433,7 @@
       "className": "SimpleComplexityChecker",
       "message": [
         {
+          "messageText": "Function ${function} is too complex. Consider breaking the function into smaller functions.",
           "code": "FUNCTION_TOO_COMPLEX",
           "severity": "WARNING"
         }
@@ -418,7 +447,7 @@
     },
     {
       "name": "WriteDumpChecker",
-      "className": "WriteDumpChecker",
+      "className": "FunctionXChecker",
       "message": [
         {
           "code": "AVOID_USING_WRITEDUMP",
@@ -472,6 +501,7 @@
       "className": "ArrayNewChecker",
       "message": [
         {
+          "messageText": "Use implict array construction instead (= []).",
           "code": "AVOID_USING_ARRAYNEW",
           "severity": "INFO"
         }
@@ -483,6 +513,7 @@
       "className": "ComplexBooleanExpressionChecker",
       "message": [
         {
+          "messageText" : "Boolean expession is too complex. Consider simplifying or moving to a named method.",
           "code": "COMPLEX_BOOLEAN_CHECK",
           "severity": "WARNING"
         }
@@ -494,6 +525,7 @@
       "className": "BooleanExpressionChecker",
       "message": [
         {
+          "messageText" : "Explicit check of boolean expession is not needed.",
           "code": "EXPLICIT_BOOLEAN_CHECK",
           "severity": "INFO"
         }
@@ -561,6 +593,10 @@
         {
           "name": "IgnoreUpperCaseScopes",
           "value": "CGI,URL"
+        },
+        {
+          "name": "IgnoreAllCapsInScopes",
+          "value": "this,variables"
         }
       ]
     },
@@ -569,32 +605,44 @@
       "className": "ArgumentNameChecker",
       "message": [
         {
+          "code": "ARGUMENT_MISSING_NAME",
+          "severity": "INFO",
+          "messageText" : "Argument is missing a name."
+        },
+        {
           "code": "ARGUMENT_INVALID_NAME",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText" : "${variable} is not a valid name. Please use CamelCase or underscores."
         },
         {
           "code": "ARGUMENT_ALLCAPS_NAME",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText" : "Argument ${variable} should not be upper case."
         },
         {
           "code": "ARGUMENT_TOO_SHORT",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText" : "Argument ${variable} should be longer than ${MinLength} characters."
         },
         {
           "code": "ARGUMENT_TOO_LONG",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText" : "Argument ${variable} should be shorter than ${MaxLength} characters."
         },
         {
           "code": "ARGUMENT_TOO_WORDY",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText" : "Argument ${variable} is too wordy, can you think of a more concise name?"
         },
         {
           "code": "ARGUMENT_IS_TEMPORARY",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText" : "Temporary argument ${variable} could be named better."
         },
         {
           "code": "ARGUMENT_HAS_PREFIX_OR_POSTFIX",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText" : "Argument has prefix or postfix ${variable} and could be named better."
         }
       ],
       "parameter": [
@@ -617,30 +665,37 @@
       "className": "MethodNameChecker",
       "message": [
         {
+          "messageText" : "Method name ${function} is not a valid name. Please use CamelCase or underscores.",
           "code": "METHOD_INVALID_NAME",
           "severity": "INFO"
         },
         {
+          "messageText" : "Method name ${function} should not be upper case.",
           "code": "METHOD_ALLCAPS_NAME",
           "severity": "INFO"
         },
         {
+          "messageText" : "Method name ${function} should be longer than ${MinLength} characters.",
           "code": "METHOD_TOO_SHORT",
           "severity": "INFO"
         },
         {
+          "messageText" : "Method name ${function} should be shorter than ${MaxLength} characters.",
           "code": "METHOD_TOO_LONG",
           "severity": "INFO"
         },
         {
+          "messageText" : "Method name ${function} is too wordy, can you think of a more concise name?",
           "code": "METHOD_TOO_WORDY",
           "severity": "INFO"
         },
         {
+          "messageText" : "Method name ${function} could be named better.",
           "code": "METHOD_IS_TEMPORARY",
           "severity": "INFO"
         },
         {
+          "messageText" : "Method name ${function} has prefix or postfix and could be named better.",
           "code": "METHOD_HAS_PREFIX_OR_POSTFIX",
           "severity": "INFO"
         }
@@ -666,31 +721,38 @@
       "message": [
         {
           "code": "COMPONENT_INVALID_NAME",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText" : "Component name ${component} is not a valid name. Please use CamelCase and start with a capital letter."
         },
         {
           "code": "COMPONENT_ALLCAPS_NAME",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText" : "Component name ${component} should not be all upper case."
         },
         {
           "code": "COMPONENT_TOO_SHORT",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText" : "Component name ${component} should be longer than ${MinLength} characters."
         },
         {
           "code": "COMPONENT_TOO_LONG",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText" : "Component name ${component} should be shorter than ${MaxLength} characters."
         },
         {
           "code": "COMPONENT_TOO_WORDY",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText" : "Component name ${component} is too wordy, can you think of a more concise name?"
         },
         {
           "code": "COMPONENT_IS_TEMPORARY",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText" : "Component name ${component} could be named better."
         },
         {
           "code": "COMPONENT_HAS_PREFIX_OR_POSTFIX",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText" : "Component name ${component} has prefix or postfix and could be named better."
         }
       ],
       "parameter": [
@@ -713,6 +775,7 @@
       "className": "FileCaseChecker",
       "message": [
         {
+          "messageText" : "File ${filename} starts with a upper case letter. Only components (.cfc files) should start with an upper case letter.",
           "code": "FILE_SHOULD_START_WITH_LOWERCASE",
           "severity": "INFO"
         }
@@ -726,6 +789,7 @@
       "className": "CreateObjectChecker",
       "message": [
         {
+          "messageText" : "CreateObject found.  Use createObject(path_to_component) or even better new path_to_component().",
           "code": "AVOID_USING_CREATEOBJECT",
           "severity": "INFO"
         }
@@ -755,10 +819,32 @@
       "message": [
         {
           "code": "UNUSED_LOCAL_VARIABLE",
-          "severity": "INFO"
+          "severity": "INFO",
+          "messageText": "Local variable ${variable} is not used in function ${function}, consider removing it."
          }
       ],
-      "parameter": []
+      "parameter": [
+        {
+          "name": "UsedTagAttributes",
+          "value": ["cfquery/name",
+          			"cfloop/index",
+          			"cfloop/item",
+          			"cfchart/name",
+          			"cfdocument/name",
+          			"cfftp/name",
+          			"cfhtmltopdf/name",
+          			"cfhttp/resultname",
+          			"cfimage/name",
+          			"cfimap/name",
+          			"cfldap/name",
+          			"cfoutput/query",
+          			"cfpdf/name",
+          			"cfreport/name",
+          			"cfsavecontent/name",
+          			"cfstoreproc/result",
+          			"cfxml/variable"]
+        }
+      ]
     },
     {
       "name": "UnusedArgumentChecker",
@@ -766,6 +852,7 @@
       "message": [
         {
           "code": "UNUSED_METHOD_ARGUMENT",
+          "messageText": "Argument ${variable} is not used in function, consider removing it.",
           "severity": "INFO"
          }
       ],
@@ -782,6 +869,243 @@
         }
       ],
       "parameter": []
+    },
+    {
+      "name": "StructKeyChecker",
+      "message": [
+        {
+          "code": "UNQUOTED_STRUCT_KEY",
+          "messageText": "Unquoted struct key ${variable} is not case-sensitive.  Quoting it is recommended.",
+          "severity": "WARNING"
+        },
+        {
+          "code": "STRUCT_ARRAY_NOTATION",
+          "messageText": "Unquoted struct key ${variable} is not case-sensitive.  Using array notation is recommended.",
+          "severity": "WARNING"
+        }
+      ],
+      "parameter": []
+    },
+    {
+      "name": "SelectStarChecker",
+      "message": [
+        {
+          "code": "SQL_SELECT_STAR",
+          "messageText": "Avoid using 'select *' in a query.",
+          "severity": "WARNING"
+        }
+      ],
+      "parameter": []
+    },
+    {
+      "name": "CFQueryChecker",
+      "message": [
+        {
+          "code": "NEVER_USE_QUERY_IN_CFM",
+          "messageText": "Don't use <cfquery> in .cfm files. Database should not be coupled with view.",
+          "severity": "WARN"
+        }
+      ],
+      "parameter": []
+    },
+    {
+      "name": "ComponentDisplayNameChecker",
+      "message": [
+        {
+          "code": "USE_DISPLAY_NAME",
+          "messageText": "Component ${variable} is has a name attribute perhaps you meant to use displayName?",
+          "severity": "INFO"
+        }
+      ],
+      "parameter": []
+    },
+    {
+      "name": "GlobalLiteralChecker",
+      "className": "LiteralChecker",
+      "message": [
+        {
+          "code": "GLOBAL_LITERAL_VALUE_USED_TOO_OFTEN",
+           "messageText": "Literal ${variable} occurs several times in one or more files. Consider giving it a name and not hard coding values.",
+          "severity": "WARNING"
+        }
+      ],
+      "parameter": [
+        {
+          "name": "Maximum",
+          "value": "3"
+        },
+        {
+          "name": "MaxWarnings",
+          "value": "5"
+        },
+        {
+          "name": "WarningScope",
+          "value": "global"
+        },
+        {
+          "name": "IgnoreWords",
+          "value": "numeric,text,textnocase,asc,desc,in,out,inout,one,all,bigdecimal,boolean,byte,char,int,long,float,double,short,string,null"
+        }
+      ]
+    },
+    {
+      "name": "LocalLiteralChecker",
+      "className": "LiteralChecker",
+      "message": [
+        {
+          "code": "LOCAL_LITERAL_VALUE_USED_TOO_OFTEN",
+          "messageText": "Literal ${variable} occurs several times in the same file. Consider giving it a name and not hard coding values.",
+          "severity": "WARNING"
+        }
+      ],
+      "parameter": [
+        {
+          "name": "Maximum",
+          "value": "3"
+        },
+        {
+          "name": "MaxWarnings",
+          "value": "5"
+        },
+        {
+          "name": "WarningScope",
+          "value": "local"
+        },
+        {
+          "name": "IgnoreWords",
+          "value": "numeric,text,textnocase,asc,desc,in,out,inout,one,all,bigdecimal,boolean,byte,char,int,long,float,double,short,string,null"
+        }
+      ]
+    },
+    {
+      "name": "PackageCaseChecker",
+      "message": [
+        {
+          "code": "PACKAGE_CASE_MISMATCH",
+          "messageText": "The case of the package folder and the object declaration do not match for ${variable}.",
+          "severity": "WARNING"
+        }
+      ]
     }
+  ],
+  "ruleGroup" : [ {
+    "name" : "BugProne",
+    "message" : [ "ARG_VAR_CONFLICT",
+    	"NO_DEFAULT_INSIDE_SWITCH",
+    	"NESTED_CFOUTPUT",
+    	"OUTPUT_ATTR",
+    	"MISSING_VAR",
+        "COMPARE_INSTEAD_OF_ASSIGN",
+        "AVOID_USING_ISDATE"
+     ]
+  }, {
+    "name" : "Correctness",
+    "message" : [ "ARG_DEFAULT_MISSING",
+    	"ARG_TYPE_ANY",
+    	"ARG_TYPE_MISSING",
+    	"ARG_VAR_MIXED",
+    	"QUERYNEW_DATATYPE",
+    	"UNUSED_LOCAL_VARIABLE",
+    	"UNUSED_METHOD_ARGUMENT",
+    	"UNQUOTED_STRUCT_KEY",
+    	"STRUCT_ARRAY_NOTATION",
+    	"USE_DISPLAY_NAME"
+    ]
+  }, {
+    "name" : "BadPractice",
+    "message" : [ "AVOID_USING_ABORT",
+    	"AVOID_USING_CFABORT_TAG",
+    	"AVOID_USING_CFDUMP_TAG",
+    	"AVOID_USING_CFEXECUTE_TAG",
+    	"AVOID_USING_CFINSERT_TAG",
+    	"AVOID_USING_CFMODULE_TAG",
+    	"AVOID_USING_CFUPDATE_TAG",
+    	"AVOID_USING_WRITEDUMP",
+    	"GLOBAL_LITERAL_VALUE_USED_TOO_OFTEN",
+    	"GLOBAL_VAR",
+    	"LOCAL_LITERAL_VALUE_USED_TOO_OFTEN",
+    	"SQL_SELECT_STAR",
+    	"AVOID_USING_DEBUG_ATTR",
+    	"AVOID_USING_CFSETTING_DEBUG",
+    	"AVOID_USING_CFINCLUDE_TAG",
+    	"AVOID_USING_ISDEBUGMODE"
+    ]
+  }, 
+  {
+    "name" : "Security",
+    "message" : [ "CFQUERYPARAM_REQ",
+		"QUERYPARAM_REQ"
+    ]
+  }, 
+  {
+    "name" : "CodeStyle",
+    "message" : [ "ARG_HINT_MISSING",
+		"COMPONENT_HINT_MISSING",
+		"FUNCTION_HINT_MISSING",
+		"FUNCTION_TYPE_ANY",
+		"FUNCTION_TYPE_MISSING",
+		"ARG_HINT_MISSING_SCRIPT"
+    ]
+  }, 
+  {
+    "name" : "ModernSyntax",
+    "message" : [ "AVOID_USING_ARRAYNEW",
+		"AVOID_USING_STRUCTNEW",
+		"AVOID_USING_CREATEOBJECT"
+    ]
+  } , 
+  {
+    "name" : "Complexity",
+    "message" : [ "COMPLEX_BOOLEAN_CHECK",
+		"EXCESSIVE_FUNCTIONS",
+		"EXCESSIVE_ARGUMENTS",
+		"EXPLICIT_BOOLEAN_CHECK",
+		"EXCESSIVE_COMPONENT_LENGTH",
+		"EXCESSIVE_FUNCTION_LENGTH",
+		"FUNCTION_TOO_COMPLEX"
+    ]
+  }, 
+  {
+    "name" : "Naming",
+    "message" : [ "METHOD_HAS_PREFIX_OR_POSTFIX",
+		"METHOD_INVALID_NAME",
+		"METHOD_IS_TEMPORARY",
+		"METHOD_TOO_SHORT",
+		"METHOD_TOO_LONG",
+		"METHOD_TOO_WORDY",
+		"VAR_ALLCAPS_NAME",
+		"VAR_HAS_PREFIX_OR_POSTFIX",
+		"VAR_INVALID_NAME",
+		"VAR_IS_TEMPORARY",
+		"VAR_TOO_SHORT",
+		"VAR_TOO_LONG",
+		"VAR_TOO_WORDY",
+		"SCOPE_ALLCAPS_NAME",
+		"ARGUMENT_MISSING_NAME",
+		"ARGUMENT_INVALID_NAME",
+		"ARGUMENT_ALLCAPS_NAME",
+		"ARGUMENT_TOO_SHORT",
+		"ARGUMENT_TOO_LONG",
+		"ARGUMENT_TOO_WORDY",
+		"ARGUMENT_IS_TEMPORARY",
+		"ARGUMENT_HAS_PREFIX_OR_POSTFIX",
+		"METHOD_ALLCAPS_NAME",
+		"COMPONENT_INVALID_NAME",
+		"COMPONENT_ALLCAPS_NAME",
+		"COMPONENT_TOO_SHORT",
+		"COMPONENT_TOO_LONG",
+		"COMPONENT_TOO_WORDY",
+		"COMPONENT_IS_TEMPORARY",
+		"COMPONENT_HAS_PREFIX_OR_POSTFIX",
+		"PACKAGE_CASE_MISMATCH"
+    ]
+  }, 
+  {
+    "name" : "Experimental",
+    "message" : [ 
+     	"NEVER_USE_QUERY_IN_CFM",
+    	"FILE_SHOULD_START_WITH_LOWERCASE"
+    ]
+  }
   ]
 }

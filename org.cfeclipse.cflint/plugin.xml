@@ -11,47 +11,262 @@
       </builder>
    </extension>
 
-	<extension
+
+    <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.cfeclipse.cflint.preferences.ShowPreferencePropertyTester"
+            id="org.cfeclipse.cflint.preferences.ShowPreferencePropertyTester"
+            namespace="org.cfeclipse.cflint.enablement.project"
+            properties="canShow"
+            type="org.eclipse.core.resources.IProject">
+      </propertyTester>
+      <propertyTester
+            class="org.cfeclipse.cflint.preferences.ShowQuickFixPropertyTester"
+            id="org.cfeclipse.cflint.preferences.ShowQuickFixPropertyTester"
+            namespace="org.cfeclipse.cflint.enablement.quickfix"
+            properties="isMarkerSelected"
+            type="org.eclipse.jface.viewers.ISelection">
+      </propertyTester>
+   </extension>
+
+
+   <extension
          point="org.eclipse.ui.propertyPages">
-	  <page
-            class="org.cfeclipse.cflint.store.ProjectPropertyPage"
-            id="org.cfeclipse.cflint.store.ProjectPropertyPage"
-            icon="icons/cflint_16x16.png"
-            name="CFLint Properties"
-            nameFilter="*">
-         <filter name="projectNature" value="org.cfeclipse.cfml.CFENature" />
-         <enabledWhen>
-            <instanceof
-                  value="org.eclipse.core.resources.IProject">
-            </instanceof>
-         </enabledWhen>
-      </page>
-	  <page
+      <page
             class="org.cfeclipse.cflint.store.ProjectPropertyPage"
             id="org.cfeclipse.cflint.store.cfbuilder.ProjectPropertyPage"
             icon="icons/cflint_16x16.png"
             name="CFLint Properties"
             nameFilter="*">
-         <filter name="projectNature" value="com.adobe.ide.coldfusion.projectNature" />
          <enabledWhen>
-            <instanceof
-                  value="org.eclipse.core.resources.IProject">
-            </instanceof>
+         <adapt type="org.eclipse.core.resources.IProject">
+            <test property="org.cfeclipse.cflint.enablement.project.canShow" forcePluginActivation="true"/>
+         </adapt>
          </enabledWhen>
       </page>
+   </extension>
 
+
+   <extension
+      point="org.eclipse.ui.preferencePages">
+      <page class="org.cfeclipse.cflint.preferences.CFLintPreferencePage"
+            name="CFLint"
+            icon="icons/cflint_16x16.png"
+            id="org.cfeclipse.cflint.preferences.CFlintPreferencePage"/>
     </extension>
 
     <extension point="org.eclipse.core.resources.markers"
-   		id="cflintmarker"
-   		name="CFLint Marker">
+   		id="problemMarker"
+   		name="CFLint Problem">
 		<super type="org.eclipse.core.resources.problemmarker"/> 
       	<super type="org.eclipse.core.resources.textmarker"/> 
       	<persistent value="true"/>
 	</extension>
+
+    <extension point="org.eclipse.core.resources.markers"
+   		id="warningMarker"
+   		name="CFLint Warning">
+        <super type="org.eclipse.core.resources.problemmarker"/> 
+		<super type="org.eclipse.core.resources.warningmarker"/> 
+      	<super type="org.eclipse.core.resources.textmarker"/> 
+      	<persistent value="true"/>
+	</extension>
+
+    <extension point="org.eclipse.core.resources.markers"
+   		id="infoMarker"
+   		name="CFLint Info">
+        <super type="org.eclipse.core.resources.problemmarker"/> 
+      	<super type="org.eclipse.core.resources.textmarker"/> 
+      	<persistent value="true"/>
+	</extension>
+
+    <extension point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+         markerType="org.cfeclipse.cflint.problemMarker"
+         class="org.cfeclipse.cflint.quickfix.QuickFixer"/>
+   </extension>
+   <extension point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+         markerType="org.cfeclipse.cflint.warningMarker"
+         class="org.cfeclipse.cflint.quickfix.QuickFixer"/>
+   </extension>
+   <extension point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+         markerType="org.cfeclipse.cflint.infoMarker"
+         class="org.cfeclipse.cflint.quickfix.QuickFixer"/>
+   </extension>
+
+    <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="org.cfeclipse.cflint.cflintContext"
+            name="CFLint">
+      </context>
+    </extension>
+
+    <extension point="org.eclipse.ui.commands">
+        <command
+            id="org.cfeclipse.cflint.quickfix.propose"
+            name="Quick Fix (CFLint)">
+        </command>
+    </extension>
+
+    <extension point="org.eclipse.ui.handlers">
+        <handler
+            class="org.cfeclipse.cflint.quickfix.QuickFixHandler"
+            commandId="org.cfeclipse.cflint.quickfix.propose">
+            <!--
+            <activeWhen>
+                <with variable="selection">
+                    <test property="org.cfeclipse.cflint.enablement.quickfix.isMarkerSelected" forcePluginActivation="true"/>
+                </with>
+            </activeWhen>
+            -->
+        </handler>
+        <handler
+            class="org.cfeclipse.cflint.quickfix.QuickFixHandler"
+            commandId="org.eclipse.jdt.ui.edit.text.java.correction.assist.proposals">
+            <activeWhen>
+                <with variable="activeContexts">
+                    <iterate ifEmpty="false" operator="or">
+                        <equals value="org.cfeclipse.cflint.cflintContext"/>
+                    </iterate>
+                </with>
+            </activeWhen>
+        </handler>
+    </extension>
+
+    <extension point="org.eclipse.ui.menus">
+        <menuContribution
+            locationURI="popup:#TextEditorContext?after=additions">
+            <command commandId="org.cfeclipse.cflint.quickfix.propose" 
+            />
+            </menuContribution>
+        <menuContribution
+            locationURI="popup:#TextEditorContext?after=additions">
+            <command commandId="org.eclipse.jdt.ui.edit.text.java.correction.assist.proposals" 
+            />
+            </menuContribution>
+    </extension>
+
+    <extension point="org.eclipse.ui.editors.annotationTypes">
+
+        <type name="org.cfeclipse.cflint.problemAnnotation"
+         markerType="org.cfeclipse.cflint.problemMarker"
+         markerSeverity="2" />
+
+        <type name="org.cfeclipse.cflint.warningAnnotation"
+            markerType="org.cfeclipse.cflint.warningMarker"/>
+
+        <type name="org.cfeclipse.cflint.infoAnnotation"
+            markerType="org.cfeclipse.cflint.infoMarker"/>
+
+    </extension>
+
+    <extension point="org.eclipse.ui.editors.markerAnnotationSpecification">
+
+        <specification
+            annotationType="org.cfeclipse.cflint.problemAnnotation"
+            verticalRulerPreferenceKey="cflint.annotation.problem.rulers.vertical"
+            textPreferenceKey="cflint.annotation.problem.text"
+            colorPreferenceKey="cflint.annotation.problem.color"
+            highlightPreferenceKey="cflint.annotation.problem.background"
+            textPreferenceValue="true"
+            textStylePreferenceKey="cflint.annotation.problem.style"
+            textStylePreferenceValue="SQUIGGLES"
+            overviewRulerPreferenceKey="cflint.annotation.problem.rulers.overview"
+            presentationLayer="4"
+            highlightPreferenceValue="false"
+            label="CFLint Problem"
+            colorPreferenceValue="255,0,128"
+            verticalRulerPreferenceValue="true"
+            overviewRulerPreferenceValue="true"
+            symbolicIcon="error"/>
+
+        <specification
+            annotationType="org.cfeclipse.cflint.warningAnnotation"
+            verticalRulerPreferenceKey="cflint.annotation.warning.rulers.vertical"
+            textPreferenceKey="cflint.annotation.warning.text"
+            colorPreferenceKey="cflint.annotation.warning.color"
+            textStylePreferenceKey="cflint.annotation.warning.style"
+            textStylePreferenceValue="SQUIGGLES"
+            highlightPreferenceKey="cflint.annotation.warning.background"
+            highlightPreferenceValue="false"
+            textPreferenceValue="true"
+            overviewRulerPreferenceKey="cflint.annotation.warning.rulers.overview"
+            presentationLayer="4"
+            label="CFLint Warning"
+            colorPreferenceValue="244,200,45"
+            verticalRulerPreferenceValue="true"
+            overviewRulerPreferenceValue="true"
+            symbolicIcon="warning"/>
+
+        <specification
+            annotationType="org.cfeclipse.cflint.infoAnnotation"
+            verticalRulerPreferenceKey="cflint.annotation.info.rulers.vertical"
+            textPreferenceKey="cflint.annotation.info.text"
+            colorPreferenceKey="cflint.annotation.info.color"
+            textStylePreferenceKey="cflint.annotation.info.style"
+            textStylePreferenceValue="SQUIGGLES"
+            highlightPreferenceKey="cflint.annotation.info.background"
+            highlightPreferenceValue="false"
+            textPreferenceValue="true"
+            overviewRulerPreferenceKey="cflint.annotation.info.rulers.overview"
+            presentationLayer="4"
+            label="CFLint Info"
+            colorPreferenceValue="244,200,45"
+            verticalRulerPreferenceValue="true"
+            overviewRulerPreferenceValue="true"
+            symbolicIcon="info"/>
+
+    </extension>
+            
+
     <extension
           id="cflintApp"
           point="org.eclipse.core.runtime.applications">
+    </extension>
+
+    <extension
+          id="product"
+          point="org.eclipse.core.runtime.products">
+       <product
+             application="org.eclipse.ui.ide.workbench"
+             name="%productName">
+          <property
+                name="windowImages"
+                value="icons/cflint_16x16.png,icons/cflint_logo.png,icons/cflint_logo.png">
+          </property>
+          <property
+                name="aboutText"
+                value="%productBlurb">
+          </property>
+          <property
+                name="aboutImage"
+                value="eclipse_lg.png">
+          </property>
+          <property
+                name="startupForegroundColor"
+                value="e6e8ff">
+          </property>
+          <property
+                name="startupProgressRect"
+                value="2,290,448,10">
+          </property>
+          <property
+                name="startupMessageRect"
+                value="7,265,320,20">
+          </property>
+          <property
+                name="appName"
+                value="%productName">
+          </property>
+          <property
+                name="preferenceCustomization"
+                value="plugin_customization.ini">
+          </property>
+       </product>
     </extension>
 
 </plugin>

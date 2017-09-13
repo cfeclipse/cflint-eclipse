@@ -24,25 +24,56 @@ import com.cflint.config.CFLintConfig;
 public class CFLintBuilder extends IncrementalProjectBuilder {
 
 	private CFLintPropertyManager propertyManager = new CFLintPropertyManager();
-	public static final String MARKER_TYPE = "org.cfeclipse.cflint.cflintmarker";
 	public static final String BUILDER_ID = "org.cfeclipse.cflint.Builder";
+	public static enum MARKER_TYPE {
+		  PROBLEM("org.cfeclipse.cflint.problemMarker")
+		 ,WARNING("org.cfeclipse.cflint.warningMarker")
+		 ,INFO("org.cfeclipse.cflint.infoMarker")
+		 ;
+		
+		private String type;
+		MARKER_TYPE(String type) {
+			this.type = type;
+		}
+
+		public String toString() {
+			return type;
+		}
+	}
+
+	public void clearMarkers() {
+		IResourceDelta delta = getDelta(getProject());
+		if(delta != null) {
+			for(MARKER_TYPE value : MARKER_TYPE.values() ) {
+				try {
+					delta.getResource().deleteMarkers(value.toString(), true, IResource.DEPTH_ONE);
+				} catch (CoreException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static void clearMarkers(IResource resource) {
+		for(MARKER_TYPE value : MARKER_TYPE.values() ) {
+			try {
+				resource.deleteMarkers(value.toString(), true, IResource.DEPTH_ONE);
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {
 		super.clean(monitor);
 		CFLintPlugin.getDefault().setProjectCFLintConfigs(new HashMap<String, CFLintConfig>());
+		clearMarkers();
 	}
 
-	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) {
+	protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) {
 		if (!propertyManager.getCFLintEnabledProject(getProject())) {
-			try {
-				IResourceDelta delta = getDelta(getProject());
-				if(delta != null) {
-					delta.getResource().deleteMarkers(MARKER_TYPE, true, IResource.DEPTH_ONE);
-				}
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
+			clearMarkers();
 			return null;
 		}
 		

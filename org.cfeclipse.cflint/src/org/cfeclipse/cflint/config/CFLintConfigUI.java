@@ -62,6 +62,11 @@ public class CFLintConfigUI {
 		ruleEditors = new ArrayList<RuleEditor>();
 		HashMap<String, String> descriptions = (HashMap<String, String>) ConfigUtils.loadDescriptions();
 		for (PluginInfoRule rule : pluginInfo.getRules()) {
+			System.out.println();
+			System.out.println(rule.getName());
+			if(rule.getName().startsWith("UnusedLocalVarChecker")) {
+				System.out.println("WTF");
+			}
 			RuleEditor ruleEdit;
 			if(enabledRules.contains(rule)){
 				rule = enabledRules.get(enabledRules.indexOf(rule));
@@ -109,7 +114,7 @@ public class CFLintConfigUI {
 		}
 		return configFile;
 	}
-	
+
 	public void setProjectRules(IProject iProject) {
 		File configFile = getConfigFile(iProject);
 		ArrayList<PluginInfoRule> rules = new ArrayList<PluginInfoRule>();
@@ -118,6 +123,11 @@ public class CFLintConfigUI {
 			rules.add(ruleEditor.getRule());
 			excludes.addAll(ruleEditor.getExcludes());
 		}
+		saveProjectRules(configFile, rules, excludes);
+	}
+
+
+	public void saveProjectRules(File configFile, ArrayList<PluginInfoRule> rules, ArrayList<PluginMessage> excludes) {
 		try {
 			String config = ConfigUtils.marshalJson(rules);
 			String excludesStr = ConfigUtils.marshalJson(excludes);
