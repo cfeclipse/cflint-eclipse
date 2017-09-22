@@ -6,8 +6,10 @@ import org.eclipse.ui.IMarkerResolution;
 
 public class QuickFix implements IMarkerResolution {
       String label;
-      QuickFix(String label) {
+      IMarker marker;
+      QuickFix(IMarker mk, String label) {
          this.label = label;
+         this.marker = mk;
       }
       public String getLabel() {
          return label;

@@ -11,9 +11,11 @@ public class QuickFixer implements IMarkerResolutionGenerator {
 		try {
 			Object problem = mk.getAttribute("messageCode");
 			return new IMarkerResolution[] { 
-				new QuickFix("Add global ignore for " + problem),
-				new QuickFix("Add function level ignore for " + problem),
-				new QuickFix("Add line ignore for " + problem),
+				new QuickFixAddGlobalIgnore(mk, "Ignore " + problem + " globally"),
+				new QuickFixAddMultiLineIgnore(mk, "Multi-line ignore of " + problem),
+				new QuickFixAddLineIgnore(mk, "Ignore line " + problem),
+				new QuickFixAddLineIgnore(mk, "Ignore entire line"),
+				new QuickFixEditCFLintConfig(mk, "Edit Configuration"),
 			};
 		} catch (CoreException e) {
 			return new IMarkerResolution[0];

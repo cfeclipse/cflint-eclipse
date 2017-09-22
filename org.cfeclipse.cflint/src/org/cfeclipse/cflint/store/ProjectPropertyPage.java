@@ -1,7 +1,9 @@
 package org.cfeclipse.cflint.store;
 
 import org.cfeclipse.cflint.CFLintBuilder;
+import org.cfeclipse.cflint.CFLintPlugin;
 import org.cfeclipse.cflint.config.CFLintConfigUI;
+import org.cfeclipse.cflint.config.RuleEditor;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -27,7 +29,9 @@ public class ProjectPropertyPage extends PropertyPage {
 	private BooleanFieldEditor cflintEnabledField;
 	private BooleanFieldEditor cflintStoreConfigInProjectField;
 	private CFLintConfigUI cflintConfigUI;
+	public static final String PAGE_ID = "org.cfeclipse.cflint.store.cfbuilder.ProjectPropertyPage";
 
+	
 	/**
 	 * Constructor for SamplePropertyPage.
 	 */
@@ -115,14 +119,14 @@ public class ProjectPropertyPage extends PropertyPage {
 	protected void performDefaults() {
 		cflintEnabledField.loadDefault();
 		cflintStoreConfigInProjectField.loadDefault();
-		cflintConfigUI.resetProjectRules();
+		cflintConfigUI.resetRules();
 	}
 
 	public boolean performOk() {
 		IProject project = (IProject) getElement();
 		propertyManager.setCFLintEnabledProject(cflintEnabledField.getBooleanValue(), project);
 		propertyManager.setCFLintStoreConfigInProject(cflintStoreConfigInProjectField.getBooleanValue(), project);
-		cflintConfigUI.setProjectRules((IProject) getElement());
+		CFLintPlugin.getDefault().saveProjectCFLintConfig((IProject) getElement(), cflintConfigUI.getConfig());
 		try {
 			final String BUILDER_ID = CFLintBuilder.BUILDER_ID;
 			IProjectDescription desc;

@@ -113,7 +113,6 @@ public class QuickFixHandler extends AbstractHandler {
 						e.printStackTrace();
 					}
 				}
-				System.out.println(annotation.getText());
 			}
 		}
 		if(targetMarker != null) {

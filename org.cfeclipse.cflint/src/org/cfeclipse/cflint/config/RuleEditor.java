@@ -25,6 +25,7 @@ public class RuleEditor extends Group {
 	private ArrayList<ParameterEditor> parameterEditors;
 	private boolean ruleEnabled;
 	private Button enabledCheckbox;
+	private List<PluginMessage> excludesMessages;
 
 	/**
 	 * Create the composite.
@@ -38,6 +39,7 @@ public class RuleEditor extends Group {
 	public RuleEditor(Composite parent, int style, PluginInfoRule rule, boolean enabled, HashMap<String, String> descriptions, List<PluginMessage> excludeMessages) {
 		super(parent, style);
 		this.rule = rule;
+		this.excludesMessages = excludeMessages;
 		setLayout(new GridLayout(1, false));
 		enabledCheckbox = new Button(this, SWT.CHECK);
 		enabledCheckbox.setFont(SWTResourceManager.getFont("Noto Sans [monotype]", 9, SWT.BOLD));
@@ -84,11 +86,19 @@ public class RuleEditor extends Group {
 		return messages;
 	}
 	
+	public ArrayList<MessageEditor> getMessagesEditors() {
+		return messageEditors;
+	}
+	
 	public ArrayList<PluginMessage> getExcludes() {
 		ArrayList<PluginMessage> excludes = new ArrayList<PluginMessage>();
 		for (MessageEditor editor : messageEditors) {
 			if(!editor.getMessageEnabled()) {
 				excludes.add(editor.getMessage());
+			} else {
+				if(excludesMessages.contains(editor.getMessage())) {
+					excludesMessages.remove(editor.getMessage());
+				}
 			}
 		}
 		return excludes;
