@@ -1,19 +1,32 @@
 package org.cfeclipse.cflint.store;
 
+import java.io.File;
+
+import org.cfeclipse.cflint.CFLintBuilder;
+import org.cfeclipse.cflint.CFLintPlugin;
 import org.cfeclipse.cflint.config.CFLintConfigUI;
+import org.cfeclipse.cflint.config.RuleEditor;
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 public class ProjectPropertyPage extends PropertyPage {
@@ -23,7 +36,9 @@ public class ProjectPropertyPage extends PropertyPage {
 	private BooleanFieldEditor cflintEnabledField;
 	private BooleanFieldEditor cflintStoreConfigInProjectField;
 	private CFLintConfigUI cflintConfigUI;
+	public static final String PAGE_ID = "org.cfeclipse.cflint.store.cfbuilder.ProjectPropertyPage";
 
+	
 	/**
 	 * Constructor for SamplePropertyPage.
 	 */
@@ -53,7 +68,7 @@ public class ProjectPropertyPage extends PropertyPage {
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
 		gd.horizontalSpan = 2;
 		group.setLayoutData(gd);
-		group.setLayout(new GridLayout(2, false));
+		group.setLayout(new GridLayout(3, false));
 		Composite myC1= new Composite(group,SWT.NONE);
 		this.cflintEnabledField = new BooleanFieldEditor(CFLintPreferenceConstants.P_CFLINT_ENABLED,
 				"Enable CFLint for this project", myC1);
@@ -63,6 +78,20 @@ public class ProjectPropertyPage extends PropertyPage {
 		Composite myC2= new Composite(group,SWT.NONE);
 		this.cflintStoreConfigInProjectField = new BooleanFieldEditor(CFLintPreferenceConstants.P_CFLINT_STOREINPROJECT,
 				"Store CFLint config in project", myC2);
+		final Button resetButton = new Button(group, SWT.BORDER);
+		resetButton.setText("Reset Config");
+		resetButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				Button button = (Button) e.widget;
+			    MessageBox confirm = new MessageBox(Display.getCurrent().getActiveShell(),SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+			    File config = CFLintPlugin.getDefault().getConfigFile(propStore.getProject());
+			    confirm.setMessage("Are you sure you want to delete/reset " + config.getPath() + "?");
+			    if (confirm.open() == SWT.YES) {
+					CFLintPlugin.getDefault().resetConfig(propStore.getProject());
+			    }
+			}
+		});
 		this.cflintStoreConfigInProjectField.setPreferenceStore(propertyManager.getStore((IProject) getElement()));
 		this.cflintStoreConfigInProjectField.load();
 		final Group rulesGroup = new Group(composite, SWT.NONE);
@@ -111,13 +140,47 @@ public class ProjectPropertyPage extends PropertyPage {
 	protected void performDefaults() {
 		cflintEnabledField.loadDefault();
 		cflintStoreConfigInProjectField.loadDefault();
-		cflintConfigUI.resetProjectRules();
+		cflintConfigUI.resetRules();
 	}
 
 	public boolean performOk() {
-		propertyManager.setCFLintEnabledProject(cflintEnabledField.getBooleanValue(), (IProject) getElement());
-		propertyManager.setCFLintStoreConfigInProject(cflintStoreConfigInProjectField.getBooleanValue(), (IProject) getElement());
-		cflintConfigUI.setProjectRules((IProject) getElement());
+		IProject project = (IProject) getElement();
+		propertyManager.setCFLintEnabledProject(cflintEnabledField.getBooleanValue(), project);
+		propertyManager.setCFLintStoreConfigInProject(cflintStoreConfigInProjectField.getBooleanValue(), project);
+		CFLintPlugin.getDefault().saveProjectCFLintConfig((IProject) getElement(), cflintConfigUI.getConfig());
+		try {
+			final String BUILDER_ID = CFLintBuilder.BUILDER_ID;
+			IProjectDescription desc;
+			desc = project.getDescription();
+			ICommand[] commands = desc.getBuildSpec();
+			boolean found = false;
+			for (int i = 0; i < commands.length; ++i) {
+				if (commands[i].getBuilderName().equals(BUILDER_ID)) {
+					found = true;
+					break;
+				}
+			}
+			if (!found && cflintEnabledField.getBooleanValue()) {
+				ICommand command = desc.newCommand();
+				command.setBuilderName(BUILDER_ID);
+				ICommand[] newCommands = new ICommand[commands.length + 1];
+				// Add it before other builders.
+				System.arraycopy(commands, 0, newCommands, 1, commands.length);
+				newCommands[0] = command;
+				desc.setBuildSpec(newCommands);
+				project.setDescription(desc, null);
+			} else if (found && !cflintEnabledField.getBooleanValue()) {
+				ICommand[] newCommands = new ICommand[commands.length - 1];
+				for (int i = 0; i < commands.length; ++i) {
+					if (!commands[i].getBuilderName().equals(BUILDER_ID)) {
+						newCommands[i] = commands[i];
+					}
+				}				
+			}
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return true;
 	}
 
