@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import org.cfeclipse.cflint.store.CFLintPropertyManager;
@@ -13,6 +14,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
@@ -22,6 +28,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.progress.IProgressService;
 import org.osgi.framework.BundleContext;
 
 import com.cflint.BugInfo;
@@ -117,7 +124,7 @@ public class CFLintPlugin extends AbstractUIPlugin {
 		}
 		return config;
 	}
-	
+
 	public CFLintConfig _getProjectCFLintConfig(IProject iProject) {
 		CFLintConfig currentConfig = null;
 		File configFile = getConfigFile(iProject);
@@ -133,7 +140,16 @@ public class CFLintPlugin extends AbstractUIPlugin {
 		}
 		return currentConfig;
 	}
+
+	public CFLintConfig resetConfig(IProject iProject) {
+		String projectName = iProject.getName();
+		projectCFLintConfigs.remove(projectName);
+		File configFile = getConfigFile(iProject);
+		configFile.delete();
+		return getProjectCFLintConfig(iProject);
+	}
 	
+
 	public File getConfigFile(IProject iProject) {
 		File configFile;
 		if (!propertyManager.getCFLintStoreConfigInProject(iProject)) {
@@ -144,7 +160,7 @@ public class CFLintPlugin extends AbstractUIPlugin {
 		return configFile;
 	}
 	
-	public void saveProjectCFLintConfig(IProject iProject, CFLintConfig cflintConfig) {
+	public void saveProjectCFLintConfig(final IProject iProject, CFLintConfig cflintConfig) {
 		try {
 			PrintWriter writer;
 			File configFile = getConfigFile(iProject);
@@ -155,19 +171,21 @@ public class CFLintPlugin extends AbstractUIPlugin {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		try {
-			iProject.build(IncrementalProjectBuilder.CLEAN_BUILD, null);
-			iProject.build(IncrementalProjectBuilder.FULL_BUILD, null);
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		class BuildJob extends Job {
+			public BuildJob() {
+				super("CFLint - cleaning and rebuilding: " + iProject.getName());
+			}
+			public IStatus run(IProgressMonitor monitor) {
+				try {
+					iProject.build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
+					iProject.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+				} catch (CoreException e) {
+					e.printStackTrace();
+				}
+				return Status.OK_STATUS;
+			}
 		}
-	}
-	
-	public CFLintConfig resetRules() {
-		CFLintConfig config = new CFLintConfig();
-		config.setRules(pluginInfo.getRules());
-		return config;
+		new BuildJob().schedule();
 	}
 	
 	public void addMarkers(IResource res) {
@@ -257,8 +275,8 @@ public class CFLintPlugin extends AbstractUIPlugin {
 			}
 			int lineNumber = bug.getLine();
 			String messageText = bug.getSeverity() + ": " + bug.getMessage() + " (" + bug.getMessageCode() + ")";
-			messageText += " offset:" + bug.getOffset() + " col:" + bug.getColumn() + " line:" + bug.getLine() + " len:"
-					+ bug.getLength();
+//			messageText += " offset:" + bug.getOffset() + " col:" + bug.getColumn() + " line:" + bug.getLine() + " len:"
+//					+ bug.getLength();
 			marker.setAttribute(IMarker.MESSAGE, messageText);
 			if (lineNumber == -1) {
 				lineNumber = 1;

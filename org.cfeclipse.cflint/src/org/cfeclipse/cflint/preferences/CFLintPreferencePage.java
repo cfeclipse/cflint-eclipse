@@ -61,6 +61,14 @@ public class CFLintPreferencePage extends FieldEditorPreferencePage implements I
 				}
 			}
 		});
+		final Button resetButton = new Button(getFieldEditorParent(), SWT.BORDER);
+		resetButton.setText("Reset Config (Needed sometimes for new versions, ugly but all we got for now)");
+		resetButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				cfmlpm.initializeDefaultValues();
+			}
+		});
 
 	}
 
