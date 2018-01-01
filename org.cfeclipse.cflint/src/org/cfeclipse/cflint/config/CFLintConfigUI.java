@@ -187,6 +187,9 @@ public class CFLintConfigUI {
 	}
 	
 	public CFLintConfig getConfig() {
+		if(cflintConfig == null) {
+			resetRules();
+		}
 		List<PluginInfoRule> rules = cflintConfig.getRules();
 		List<PluginMessage> excludes = cflintConfig.getExcludes();
 		for (RuleEditor ruleEditor : ruleEditors) {

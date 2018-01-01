@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.cfeclipse.cflint</groupId>
 		<artifactId>cflint</artifactId>
-		<version>1.3.0-SNAPSHOT</version>
+		<version>1.3.0</version>
 	</parent>
 	<artifactId>org.cfeclipse.cflint</artifactId>
 	<packaging>eclipse-plugin</packaging>

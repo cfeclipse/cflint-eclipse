@@ -118,7 +118,7 @@ public class CFLintPlugin extends AbstractUIPlugin {
 	public CFLintConfig getProjectCFLintConfig(IProject iProject) {
 		String projectName = iProject.getName();
 		CFLintConfig config = projectCFLintConfigs.get(projectName);
-		if (config == null) {
+		if (config == null || config.getRules() == null) {
 			config = _getProjectCFLintConfig(iProject);
 			projectCFLintConfigs.put(projectName, config);
 		}
@@ -130,6 +130,7 @@ public class CFLintPlugin extends AbstractUIPlugin {
 		File configFile = getConfigFile(iProject);
 		if (configFile.exists()) {
 			try {
+				currentConfig = new CFLintConfig();
 				currentConfig = ConfigUtils.unmarshalJson(new FileInputStream(configFile), CFLintConfig.class);
 			} catch (Exception e) {
 				e.printStackTrace();

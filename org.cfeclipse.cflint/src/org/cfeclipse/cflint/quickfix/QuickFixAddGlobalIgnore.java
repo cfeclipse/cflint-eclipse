@@ -8,6 +8,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IMarkerResolution;
 
 import com.cflint.config.CFLintConfig;
+import com.cflint.config.CFLintPluginInfo.PluginInfoRule.PluginMessage;
 
 public class QuickFixAddGlobalIgnore extends QuickFix {
 	String	label;
@@ -28,7 +29,7 @@ public class QuickFixAddGlobalIgnore extends QuickFix {
 			IProject iProject = CFLintPlugin.getDefault().getCurrentProject();
 			CFLintConfig cflintConfig = CFLintPlugin.getDefault().getProjectCFLintConfig(iProject);
 			String code = marker.getAttribute("CFLINT_MESSAGE_CODE").toString();
-			cflintConfig.addExclude(code);
+			cflintConfig.addExclude(new PluginMessage(code));
 			CFLintPlugin.getDefault().saveProjectCFLintConfig(iProject, cflintConfig);
 //			MessageDialog.openInformation(null, "Add global ignore", "Added global ignore for " + code);
 		} catch (CoreException e) {
