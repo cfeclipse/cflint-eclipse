@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
+import org.cfeclipse.cflint.console.ConsoleUtil;
 import org.cfeclipse.cflint.store.CFLintPropertyManager;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -47,19 +48,20 @@ import com.cflint.tools.CFLintFilter;
 public class CFLintPlugin extends AbstractUIPlugin {
 	
 	// The plug-in ID
-	public static final String			  PLUGIN_ID			   = "org.cfeclipse.cflint";			 //$NON-NLS-1$
+	public static final String PLUGIN_ID	= "org.cfeclipse.cflint"; //$NON-NLS-1$
+	public static final String CONSOLE_NAME	= "CFLint";
 	
 	// The shared instance
-	private static CFLintPlugin			  plugin;
+	private static CFLintPlugin plugin;
 	
 	private CFLint						  cflint;
 	private CFLint						  scannerLinter;
 	private HashMap<String, CFLintConfig> projectCFLintConfigs = new HashMap<String, CFLintConfig>();
 	
-	private CFLintPropertyManager		  propertyManager;
-
-	private CFLintPartListener cflintPartListener;
-	private static final CFLintPluginInfo pluginInfo		   = ConfigUtils.loadDefaultPluginInfo();
+	private CFLintPropertyManager propertyManager;
+	
+	private CFLintPartListener			  cflintPartListener;
+	private static final CFLintPluginInfo pluginInfo = ConfigUtils.loadDefaultPluginInfo();
 	
 	public HashMap<String, CFLintConfig> getProjectCFLintConfigs() {
 		return projectCFLintConfigs;
@@ -87,7 +89,7 @@ public class CFLintPlugin extends AbstractUIPlugin {
 		plugin = this;
 		propertyManager = new CFLintPropertyManager();
 		cflintPartListener = new CFLintPartListener();
-
+		
 		this.getWorkbench().addWindowListener(cflintPartListener);
 	}
 	
@@ -114,7 +116,7 @@ public class CFLintPlugin extends AbstractUIPlugin {
 	public IEditorPart getLastActiveEditor() {
 		return cflintPartListener.getLastActiveEditor();
 	}
-
+	
 	public CFLintConfig getProjectCFLintConfig(IProject iProject) {
 		String projectName = iProject.getName();
 		CFLintConfig config = projectCFLintConfigs.get(projectName);
@@ -124,7 +126,7 @@ public class CFLintPlugin extends AbstractUIPlugin {
 		}
 		return config;
 	}
-
+	
 	public CFLintConfig _getProjectCFLintConfig(IProject iProject) {
 		CFLintConfig currentConfig = null;
 		File configFile = getConfigFile(iProject);
@@ -141,7 +143,7 @@ public class CFLintPlugin extends AbstractUIPlugin {
 		}
 		return currentConfig;
 	}
-
+	
 	public CFLintConfig resetConfig(IProject iProject) {
 		String projectName = iProject.getName();
 		projectCFLintConfigs.remove(projectName);
@@ -150,7 +152,6 @@ public class CFLintPlugin extends AbstractUIPlugin {
 		return getProjectCFLintConfig(iProject);
 	}
 	
-
 	public File getConfigFile(IProject iProject) {
 		File configFile;
 		if (!propertyManager.getCFLintStoreConfigInProject(iProject)) {
@@ -176,6 +177,7 @@ public class CFLintPlugin extends AbstractUIPlugin {
 			public BuildJob() {
 				super("CFLint - cleaning and rebuilding: " + iProject.getName());
 			}
+			
 			public IStatus run(IProgressMonitor monitor) {
 				try {
 					iProject.build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
@@ -211,7 +213,7 @@ public class CFLintPlugin extends AbstractUIPlugin {
 				cflint.setConfiguration(config);
 			}
 			File sourceFile = res.getRawLocation().makeAbsolute().toFile();
-			System.out.println("Scanning " + sourceFile.getAbsolutePath());
+			log("Scanning " + sourceFile.getAbsolutePath());
 			cflint.scan(sourceFile);
 			BugList bugList = cflint.getBugs();
 			for (BugInfo bugInfo : bugList) {
@@ -248,7 +250,7 @@ public class CFLintPlugin extends AbstractUIPlugin {
 			}
 			scannerLinter.getBugs().getBugList().clear();
 			File sourceFile = res.getRawLocation().makeAbsolute().toFile();
-			System.out.println("Scanning Resource" + sourceFile.getAbsolutePath());
+			log("Scanning Resource" + sourceFile.getAbsolutePath());
 			scannerLinter.scan(sourceFile);
 			BugList bugList = scannerLinter.getBugs();
 			for (BugInfo bugInfo : bugList) {
@@ -276,8 +278,9 @@ public class CFLintPlugin extends AbstractUIPlugin {
 			}
 			int lineNumber = bug.getLine();
 			String messageText = bug.getSeverity() + ": " + bug.getMessage() + " (" + bug.getMessageCode() + ")";
-//			messageText += " offset:" + bug.getOffset() + " col:" + bug.getColumn() + " line:" + bug.getLine() + " len:"
-//					+ bug.getLength();
+			// messageText += " offset:" + bug.getOffset() + " col:" + bug.getColumn() + " line:" + bug.getLine() + "
+			// len:"
+			// + bug.getLength();
 			marker.setAttribute(IMarker.MESSAGE, messageText);
 			if (lineNumber == -1) {
 				lineNumber = 1;
@@ -338,6 +341,14 @@ public class CFLintPlugin extends AbstractUIPlugin {
 			}
 		}
 		return project;
+	}
+	
+	public static void log(String msg) {
+		ConsoleUtil.printInfo(CONSOLE_NAME, msg);
+	}
+	
+	public static void logError(String msg) {
+		ConsoleUtil.printError(CONSOLE_NAME, msg);
 	}
 	
 }
